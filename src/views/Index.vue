@@ -1,0 +1,502 @@
+<template>
+  <div id="about">
+    <div class="aboutbox">
+      <!-- 标题 -->
+      <div class="abouttop">
+        <div class="abouttitle">浩成娱乐城财务跟踪管理系统</div>
+        <div class="head-user">
+          <span>管理员</span>
+          <!-- <router-link style="text-decoration:none;color:#e5fdff;">{{ username }}</router-link> -->
+          <span style="text-decoration:none;color:#e5fdff;">{{ username }}</span>
+          <span>您好</span>|
+          <!-- <router-link to="/" :plain="true" @click="open" style="text-decoration:none;color:#fff;">退出</router-link> -->
+          <span @click="open" style="text-decoration:none;color:#fff;cursor: pointer;">退出</span>
+          <!-- <el-button :plain="true" @click="open">退出</el-button> -->
+        </div>
+      </div>
+
+      <!-- 主要内容大盒子 -->
+      <div class="aboutbottom">
+        <div class="navigatioss">
+          <el-container>
+            <!-- 左边导航栏 -->
+            <el-aside
+              width="220px"
+              :style="{ height: screenHeight - 90 + 'px',backgroundRepeat:'no-repeat'}"
+            >
+            <el-scrollbar style='height:100%;'>
+              <el-col :span="24">
+                <div class="toptitle" @click="show">
+                  <i class="el-icon-menu"></i>
+                  系统首页
+                </div>
+                <el-menu
+                  :default-active="active"
+                  class="bimain"
+                  @open="handleOpen"
+                  @close="handleClose"
+                  text-color="#e1e1e1"
+                  active-text-color="#ffffff"
+                  unique-opened
+                  
+                  collapse-transition
+                  router
+                >
+                  <el-submenu v-for="item in nav" :key="item.name" :index="item.index">
+                    <template slot="title" class="title">
+                      <span style="font-size: 16px;">{{item.name}}</span>
+                    </template>
+                    <el-menu-item-group v-for="pro in item.children" :key="pro.name">
+                      <el-menu-item class="children" style='padding-left:70px;' :index="pro.index">{{pro.name}}</el-menu-item>
+                    </el-menu-item-group>
+                  </el-submenu>
+                </el-menu>
+              </el-col>
+              </el-scrollbar>
+            </el-aside>
+
+            <!-- 右边内容 -->
+            <el-main :style="{ height: screenHeight - 90 + 'px'}">
+            <!-- <el-main> -->
+            	  <el-scrollbar style='height:100%;'>
+              <router-view />
+              </el-scrollbar>
+            </el-main>
+          </el-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      // 用户名
+      username: "请登录！",
+      active: this.$router.path,
+      screenHeight: document.body.clientHeight,
+      // 导航栏
+      nav: [
+        // 用户管理
+        {
+          index: "/index/stapage",
+          name: "用户管理",
+          icon: "el-icon-s-cooperation",
+          children: [
+            { index: "/index/stapage", name: "统计页面" },
+            { index: "/index/userlist", name: "代理列表" },
+            { index: "/index/viplist", name: "会员列表" },
+            // { index: "/index/cuserlist", name: "子代理列表" },
+            // { index: "/index/cviplist", name: "子会员列表" },
+            { index: "/index/delagent", name: "已删代理" },
+            { index: "/index/delvip", name: "已删会员" },
+          ]
+        },
+        // 代理账目
+        {
+          index: "/index/accountlist",
+          name: "代理账目",
+          icon: "el-icon-top",
+          children: [
+            { index: "/index/accountlist", name: "代理账目列表" },
+            // { index: "/index/settle", name: "代理结账列表" },
+            // { index: "/index/czmsettle", name: "子代理账目列表" },
+            // { index: "/index/csettle", name: "子代理结账列表" },
+            { index: "/index/conaccounts", name: "公司账目" }
+          ]
+        },
+        // 会员账目
+        {
+          index: "/index/vipaccountslist",
+          name: "会员账目",
+          icon: "el-icon-bottom",
+          children: [
+            { index: "/index/vipaccountslist", name: "会员账目列表" },
+            // { index: "/index/cvipaccountslist", name: "子会员账目列表" },
+            // { index: "/index/betdetails", name: "下注详单" }
+          ]
+        },
+        // 铺流水账目
+        {
+          index: "/index/runninglist",
+          name: "铺流水账目",
+          icon: "el-icon-s-data",
+          children: [
+            { index: "/index/runninglist", name: "账目列表" },
+            // { index: "/index/changerunning", name: "修改结果详情" }
+          ]
+        },
+        // 台桌管理
+        {
+          index: "/index/desklist",
+          name: "台桌管理",
+          icon: "el-icon-user-solid",
+          children: [
+            { index: "/index/desklist", name: "台桌列表" },
+//          { index: "/index/deskdetails", name: "台桌详单" }
+          ]
+        },
+        // 龙虎和局
+        {
+          index: "/index/dragontiger",
+          name: "龙虎和局",
+          icon: "el-icon-user",
+          children: [
+            { index: "/index/dragontiger", name: "龙虎和局" },
+            // { index: "/index/dragontiger1", name: "详单" }
+          ]
+        },
+        // 洗码结账
+        {
+          index: "/index/codeclearing",
+          name: "洗码结账",
+          icon: "el-icon-user",
+          children: [
+            { index: "/index/codeclearing", name: "洗码结账" },
+            // { index: "/index/codeclearing1", name: "详单" }
+          ]
+        },
+        // 系统设置
+        {
+          index: "/index/setup",
+          name: "系统设置",
+          icon: "el-icon-user",
+          children: [{ index: "/index/setup", name: "通用模板" }]
+        }
+      ]
+    };
+  },
+
+  created() {
+    this.active = location.hash.replace("#", "");
+    this.username = localStorage.getItem("username");
+  },
+  methods: {
+     open() {
+        this.$message('退出成功');
+        this.$router.push('/')
+      },
+  	show(){
+// alert("欢迎")
+   this.$router.push('/index/welcome')
+   },
+    handleOpen(key, keyPath) {
+      this.active = key;
+      this.$router.push(key);
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
+    }
+  },
+ 
+  mounted() {
+    // 滚动条
+    const that = this;
+    window.onresize = () => {
+      return (() => {
+        window.screenHeight = document.body.clientHeight;
+        that.screenHeight = window.screenHeight;
+      })();
+    };
+  },
+  watch: {
+    screenHeight(val) {
+      // 为了避免频繁触发resize函数导致页面卡顿，使用定时器
+      if (!this.timer) {
+        // 一旦监听到的screenWidth值改变，就将其重新赋给data里的screenWidth
+        this.screenHeight = val;
+        this.timer = true;
+        let that = this;
+        setTimeout(function() {
+          // 打印screenWidth变化的值
+          //console.log(that.screenHeight);
+          that.timer = false;
+        }, 400);
+      }
+    }
+  }
+};
+</script>
+
+<style lang="less">
+// 总页面设置,最大成级
+#about {
+  width: 100%;
+  height: 100%;
+  background-image: url(../assets/imgs/backgrounds.png);
+  background-size: 100% 100%;
+  // background-color: #010d34;
+}
+.aboutbox {
+  width: 100%;
+  height: 100%;
+}
+// 顶部
+.abouttop {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 10px;
+  position: relative;
+}
+// 标题 浩成娱乐城财务跟踪管理系统
+.abouttitle {
+  line-height: 50px;
+  width: 100%;
+  height: 50px;
+  color: #e5fdff;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+// 管理员名字
+.head-user {
+  position: absolute;
+  top: 14px;
+  right: 22%;
+  color: #fff;
+  font-size: 12px;
+}
+
+// 主要内容大盒子
+.aboutbottom {
+  width: 100%;
+  height: calc(100% - 60px);
+}
+.navigatioss {
+  padding-left: 2%;
+  padding-right: 2%;
+}
+// 左边导航栏
+.el-aside {
+  color: #e5fdff;
+  text-align: center;
+  line-height: 100%;
+  height: 80%;
+  margin-left: 1%;
+  border: 1px solid #064259;
+  background: #162c79 url(../assets/imgs/navigations.png);
+  background-position: bottom;
+  background-size: contain;
+}
+
+//导航栏的颜色与背景修改
+.el-menu-item.is-active {
+  background-color: #052f92 !important;
+  color: #ffffff;
+}
+
+
+
+// 系统首页名字
+.toptitle {
+  width: 100%;
+  height: 42px;
+  // background-color: #00205e;
+  // background-color: #052F92;
+  text-align: center;
+  line-height: 40px;
+}
+
+// 导航
+.el-menu {
+   height: 80%;
+  width: 100%;
+  border-right: none;
+  background: none;
+}
+.title {
+  padding-left: 0px;
+}
+.children {
+  padding: 0;
+}
+
+// hover主菜单
+.el-submenu__title:focus, .el-submenu__title:hover{
+    outline: 0 !important;
+    color: #409EFF !important;
+    background: #002475 !important;
+}
+
+// hover子菜单
+.el-menu-item:hover{
+    outline: 0 !important;
+    background: #002475 !important;
+    color: #409EFF !important;
+  
+}
+// 选中效果
+.el-menu-item.is-active {
+    color: #409EFF !important;
+    background: #011347 !important;
+}
+
+// 导航的行高
+.el-menu-item-group__title{
+  padding: 0;
+}
+// 子菜单行高
+.el-submenu .el-menu-item {
+  min-width: 90%;
+  height: 40px;
+  line-height: 40px;
+}
+
+// 取消滚动条
+// ::-webkit-scrollbar {
+//   width: 0 !important;
+//   overflow-y: scroll;
+// }
+// ::-webkit-scrollbar {
+//   width: 0 !important;
+//   height: 0;
+// }
+
+/*更改滚动条*/
+.el-aside .el-scrollbar__wrap {
+  overflow-x: hidden;
+  // display: none;
+}
+.el-main .el-scrollbar__wrap {
+  overflow-x: hidden;
+}
+
+// 主要内容
+.el-main {
+  background-color: #010d34;
+  text-align: center;
+  // height: calc(100% - 60px);
+  padding: 0;
+  margin-left: 1%;
+  
+}
+
+// 主要内容的全局样式
+#app {
+  background-color: #010d34;
+  width: 100%;
+}
+
+// 面包屑
+.bigbread {
+  // width: 99%;
+  height: 40px;
+  // background-color: #01184c;
+  border: 1px solid #064259;
+  margin-bottom: 10px;
+}
+.bread {
+  line-height: 40px;
+  // width: 80%;
+  height: 100%;
+  padding-left: 30px;
+  color: #fff;
+  font-size: 14px;
+  text-align: start;
+}
+
+// inputu输入框样式
+.inputcolor {
+  width: 99%;
+  // background-color: #01184c;
+  margin-bottom: 10px;
+  border: 1px solid #064259;
+}
+// input框直角
+.el-input__inner {
+  border-radius: 0;
+}
+// 共式
+#box,
+#main,
+#main1 {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 99%;
+  flex-wrap: wrap;
+}
+.time {
+  margin: 0 20px 0;
+}
+
+// list
+#list {
+  border: 1px solid #064259;
+  // height: 100%;
+  width: 99%;
+  margin-bottom: 5px;
+}
+//表格错位
+body .el-table th.gutter{
+    display: table-cell!important;
+}
+ 
+body .el-table colgroup.gutter{
+    display: table-cell!important;
+}
+// 请list下边白线
+.el-table::before {
+  height: 0;
+  width: 0;
+}
+.el-table::after {
+  height: 0;
+  width: 0;
+}
+.el-table__fixed-right::before,
+.el-table__fixed::before {
+  height: 0;
+  width: 0;
+}
+.el-table__fixed-right::after,
+.el-table__fixed::after {
+  height: 0;
+  width: 0;
+}
+.el-table--border,
+.el-table--group {
+  border: none;
+}
+// 分页
+.fen {
+  width: 98%;
+  padding-top: 5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 10px 16px 0 10px;
+  border-top: solid 1px #064259;
+}
+
+
+.bottomp {
+  color: #fff;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+
+// 其它
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409eff;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
+}
+body > .el-container {
+  margin-bottom: 0;
+}
+
+
+
+// 提示文字
+  .el-message-box__message p{
+  color: #fff;
+
+  }
+
+</style>

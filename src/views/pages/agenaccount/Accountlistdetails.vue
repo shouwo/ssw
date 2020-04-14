@@ -1,0 +1,119 @@
+<template>
+  <div id="app">
+    <!-- 面包屑 -->
+    <div class="bigbread">
+      <div class="bread">
+        当前位置：
+        <span>
+          <router-link to="/index/welcome" style="text-decoration:none;color:#fff;">首页</router-link>
+        </span>/
+        <span>
+          <router-link to="/index/accountlist" style="text-decoration:none;color:#fff;">代理账目列表</router-link>
+        </span>/
+        <span>详情</span>
+      </div>
+    </div>
+
+    <div id="list">
+      <div class="tabellist">
+        <el-table v-tableDrag :data="tableData" border style="width: 100%">
+          <el-table-column prop="type" label="台桌类型" width="150"></el-table-column>
+          <el-table-column prop="mode" label="下注方式" width="120"></el-table-column>
+          <el-table-column prop="accountnumber" label="帐号" width="120"></el-table-column>
+          <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+          <el-table-column prop="pledge" label="总押" width="120"></el-table-column>
+          <el-table-column prop="win" label="总赢" width="120"></el-table-column>
+          <el-table-column prop="codecleaning" label="总洗码" width="120"></el-table-column>
+          <el-table-column prop="rate" label="洗码率" width="120"></el-table-column>
+          <el-table-column prop="cost" label="洗码费" width="120"></el-table-column>
+
+          <el-table-column prop="shares" label="占股" width="150"></el-table-column>
+          <el-table-column prop="currency" label="币种" width="120"></el-table-column>
+          <el-table-column prop="profit" label="占股收益" width="120"></el-table-column>
+          <el-table-column prop="totalrevenue" label="总收益" width="120"></el-table-column>
+          <el-table-column prop="noincome" label="未结收益" width="120"></el-table-column>
+          <el-table-column prop="company" label="总公司" width="120"></el-table-column>
+          <el-table-column prop="settleaccounts" label="上次结账"></el-table-column>
+        </el-table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { detailsaccountlist } from "../../../apis/apis";
+export default {
+  data() {
+    return {
+      tableData: [
+        // {
+        //   type: "",
+        //   mode: "",
+        //   accountnumber: "",
+        //   name: "",
+        //   pledge: "",
+        //   win: "",
+        //   codecleaning: "",
+        //   rate: "",
+        //   cost: "",
+        //   shares: "",
+        //   currency: "",
+        //   profit: "",
+        //   totalrevenue: "",
+        //   noincome: "",
+        //   company: "",
+        //   settleaccounts: ""
+        // }
+      ]
+    };
+  },
+  created() {
+    console.log(this.$route.params.data);
+    this.tableData[0] = this.$route.params.data;
+    detailsaccountlist().then(res => {
+      this.tableData[0] = res.data;
+    });
+  }
+};
+</script>
+
+<style scoped>
+.tabellist >>> .el-table__body tr:hover > td {
+  background: rgb(1, 23, 82);
+}
+.tabellist >>> .el-table td,
+.el-table th.is-leaf {
+  background: rgb(1, 19, 71);
+  color: #ffffff;
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+}
+.tabellist >>> .el-table--border {
+  color: #ffffff;
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+}
+.tabellist >>> .el-table--border th,
+.el-table__fixed-right-patch {
+  background: rgb(0, 36, 117);
+  border-collapse: collapse;
+  color: #ffffff;
+}
+.tabellist >>> .el-table th {
+  background: rgb(0, 36, 117);
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+  color: #ffffff;
+}
+#thisbox >>> .el-form-item__label,
+.el-radio {
+  color: #ffffff;
+}
+.inputcolors >>> .el-form-item__label,
+.el-radio {
+  color: #ffffff;
+}
+.el-form-item {
+  margin-bottom: 8px;
+}
+</style>

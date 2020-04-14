@@ -1,0 +1,519 @@
+<template>
+  <div id="app">
+    <!-- 面包屑 -->
+    <div class="bigbread">
+      <div class="bread">
+        当前位置：
+        <span>
+          <router-link to="/index/welcome" style="text-decoration:none;color:#fff;">首页</router-link>
+        </span>/
+        <span>龙虎和局</span>
+      </div>
+    </div>
+    <!-- 输入框 -->
+    <div class="inputcolor">
+      <div class="inputcolors" style="padding:8px 0 0 26px;text-align: left;font-size:14px;">
+        <div id="bigbox">
+          <el-form id="box" style="margin-bottom:10px;" ref="form" :model="form" label-width="80px">
+            <div class="block">
+              <span
+                class="demonstration"
+                style="color: #FFFFFF;font-size: 14px;padding: 0 12px 0 0;margin-left: 12px;"
+              >日期选择</span>
+              <el-date-picker
+                v-model="value1"
+                type="daterange"
+                style="width:230px;"
+                size="mini"
+                range-separator="——"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+              ></el-date-picker>
+            </div>
+            <el-radio-group class="time" v-model="form.resource">
+              <el-radio label="今天" ></el-radio>
+              <el-radio label="昨天"></el-radio>
+              <el-radio label="本月"></el-radio>
+              <el-radio label="上月"></el-radio>
+              <el-radio label="全部"></el-radio>
+            </el-radio-group>
+            <el-button
+              type="primary"
+              style="background:#05339C;border:#05339C;color:#fff;"
+              size="mini"
+              @click="see"
+            >查看</el-button>
+            <!--<el-button
+              size="mini"
+              style="background:#05339C;border:#05339C;color:#fff;"
+              @click="exportss"
+            >导出</el-button>-->
+          </el-form>
+        </div>
+        <div id="bigmain">
+          <el-form id="main" ref="form" :model="form" label-width="80px">
+            <el-form-item label="桌号">
+              <el-input
+                id="tablenumber"
+                size="mini"
+                v-model="form.tablenumber"
+                style="width:120px;"
+                placeholder="请输入桌号"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="靴号">
+              <el-input
+                size="mini"
+								type="number"
+                v-model="form.bootnumber"
+                style="width:120px;"
+                placeholder="请输入靴号"
+              ></el-input>
+            </el-form-item>
+             <el-form-item label="类型" size="mini" style="width:200px;" label-width="80px">
+              <!-- 类型下拉框 -->
+              <el-select v-model="form.choice" placeholder="全部">
+                <el-option
+                  v-for="item in choices"
+                  :key="item"
+                  :label="item.indexNameCn"
+                  :value="item.codeIndex"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          <el-form-item label="注码" size="mini" style="width:200px;" label-width="80px">
+              <!-- 注码方式下拉框 -->
+              <el-select v-model="form.injections" placeholder="全部">
+                <el-option
+                  v-for="item in injectionCodes"
+                  :key="item"
+                  :label="item.indexNameCn"
+                  :value="item.codeIndex"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="洗码号">
+              <el-input size="mini" v-model="form.bets" style="width:120px;" placeholder="请输入洗码号"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </div>
+    <div id="list">
+      <div class="tabellist">
+        <!-- 台桌类型 / 下注方式 / 帐号 / 姓名 / 总押 / 总赢 / 总洗码  / 洗码率 / 洗码费 / 
+        占股 / 币种 / 占股收益 / 总收益 / 未结收益 / 总公司 / 上次结账 / 操作-->
+	
+        <el-table v-tableDrag :data="tableData" border style="width: 100%">
+          <el-table-column prop="userType" label="玩家类型" width="150"></el-table-column>
+          <el-table-column prop="id" label="ID" width="350"></el-table-column>
+          <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+          <el-table-column prop="dumpAmount" label="总金额" width="120"></el-table-column>
+          <el-table-column prop="count" label="下注次数" width="120"></el-table-column>
+          <el-table-column label="修改结果">
+            <el-button type="text" @click="dialogTableVisible = true" size="mini" style="background:#05339C;border:#05339C;color:#fff;width: 60px;" >详情</el-button>     
+            <template slot-scope="scope">
+            <el-button
+              type="text"
+              @click="details(scope.row.id)"
+              size="mini"
+              style="background:#05339C;border:#05339C;color:#fff;width: 60px;"
+            >详情</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <!-- 弹框 -->
+        <!-- <el-dialog id="wrapper" title="修改结果详情" :visible.sync="dialogTableVisible" >
+	  	    <el-form :model="form" >
+	  	    	<el-table :data="tableData" border style="width: 100%">
+		          <el-table-column prop="bet_data" label="时间" width="150"></el-table-column>
+		          <el-table-column prop="wish_id" label="洗码号" width="120"></el-table-column>
+		          <el-table-column prop="table_id" label="台号" width="120"></el-table-column>
+		          <el-table-column prop="boot_id" label="靴号" width="120"></el-table-column>
+		          <el-table-column prop="shop_id" label="铺号" width="120"></el-table-column>
+		          <el-table-column prop="dragon" label="龙" width="120"></el-table-column>
+		          <el-table-column prop="tiger" label="虎" width="120"></el-table-column>
+		          <el-table-column prop="flat" label="和" width="120"></el-table-column>
+		          <el-table-column prop="dragon_tiger_flat" label="龙虎反和" width="120"></el-table-column>
+		          <el-table-column prop="bet_size" label="注码"></el-table-column>
+		        </el-table>
+				  </el-form>
+        </el-dialog>-->
+        <!-- 分页 -->
+        <div class="fen">
+          <div class="block fenright">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage4"
+              :page-size="5"
+              :page-sizes="['10']"
+              layout="total, sizes, prev, pager, next, jumper"
+              background
+              :pager-count="5"
+              :total="total"
+            ></el-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 弹框 -->
+  </div>
+</template>
+
+<script>
+//类型,注码,查询
+import {DragonTigerlist,DragonTigerquery} from "../../../apis/apis.js";
+export default {
+  data() {
+    return {
+			page_btn:5,
+			total:"",//总条数
+      // dialogTableVisible: false,
+      // outerVisible: false,
+      // innerVisible: false,
+      value1: "",
+			//状态
+			daysTypes:"",	
+			startTime:"",//开始时间
+			endTime:"",//结束时间
+			days:"",//时间类型
+				//类型
+			choices:[
+				// {
+				// 	indexNameCn:"百家乐",
+				// 	codeIndex:1
+				// },
+				{
+					indexNameCn:"龙虎",
+					codeIndex:3
+				},],
+		   //下拉 类型
+     
+      //下注方式
+      betMethods: [
+				{
+					indexNameCn:"现金",
+					codeIndex:0
+				},
+				{
+					indexNameCn:"筹码",
+					codeIndex:1
+				},
+			],
+      //注码
+      injectionCodes: [
+				{
+					indexNameCn:"RMB",
+					codeIndex:1
+				},
+				{
+					indexNameCn:"USD",
+					codeIndex:0
+				},
+			],
+      form: {
+        timebegin: "",
+        timeend: "",
+        tablenumber: "",
+        bootnumber: "",
+        types: "",
+        injectioncode: "",
+        bets: "",
+        agentcard: "",
+        agentaccount: "",
+        agentname: "",
+				resource:"全部",
+				choice:  3,//类型的下拉框
+				injections:1,//注码
+      },
+      tableData: [
+        // {
+				// 	userType: "",
+        //   id: "",
+        //   name: "",
+        //   dumpAmount:"",
+        //   count:"",
+         
+        // }
+      ],
+      currentPage4: 1,
+      size:"10"
+    };
+  },
+  methods: {
+    //详情
+    details(val) {
+      //直接跳转
+      // this.$router.push("/index/dragontigerdetails");
+      this.$router.push({
+        name:'Dragontigerdetails',
+        params:{data:val}
+        });
+
+    },
+    see() {
+    //查看,非空约束
+      // var tablenumbers = this.form.tablenumber;
+      // var bootnumbers = this.form.bootnumber;
+      // var types = this.form.types;
+      // var injectioncodes = this.form.injectioncode;
+      // var bets = this.form.bets;
+      // if (
+      //   tablenumbers == null ||
+      //   tablenumbers == "" ||
+      //   bootnumbers == null ||
+      //   bootnumbers == "" ||
+      //   types == null ||
+      //   types == "" ||
+      //   injectioncodes == null ||
+      //   injectioncodes == "" ||
+      //   bets == null ||
+      //   bets == ""
+      // ) {
+      //   alert("查询输入框不能为空！！");
+      //   document.getElementById("tablenumber").focus();
+      // } else {
+      //   alert(
+      //     "查询的条件是：" +
+      //       tablenumbers +
+      //       ", " +
+      //       bootnumbers +
+      //       ", " +
+      //       types +
+      //       ", " +
+      //       injectioncodes +
+      //       ", " +
+      //       bets
+      //   );
+      // }
+			// console.log(this.form.injections);
+			
+			//时间选择
+			if(this.value1==""||this.value1==null){
+				// alert("空");
+				this.startTime=null,
+				this.endTime=null
+			}else{
+					//开始结束时间
+				var d = new Date(this.value1[0]); 
+				//const d = new Date(Thu Mar 07 2019 12:00:00 GMT+0800 (中国标准时间))
+				const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
+				const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
+				this.startTime=resDate+' '+resTime;
+				
+				//结束时间
+				var e = new Date(this.value1[1]); 
+				//const d = new Date(Thu Mar 07 2019 12:00:00 GMT+0800 (中国标准时间))
+				const resDates = e.getFullYear() + '-' + this.p((e.getMonth() + 1)) + '-' + this.p(e.getDate())
+				const resTimes = this.p(e.getHours()) + ':' + this.p(e.getMinutes()) + ':' + this.p(e.getSeconds())
+				this.endTime=resDates+' '+resTimes;
+				
+			}
+		
+			var days=this.form.resource;
+			switch (days){
+				case "今天":
+				this.daysTypes=1;
+					break;
+					case "昨天":
+				this.daysTypes=2;
+					break;
+					case "本月":
+				this.daysTypes=3;
+					break;
+					case "上月":
+				this.daysTypes=4;
+					break;
+				case "全部":
+				this.daysTypes="";
+						break;
+				default:
+					this.daysTypes="";
+					break;
+			}
+			
+			// alert(this.form.bootnumber);
+			
+      	DragonTigerquery(				
+				//查询时间类型
+				this.form.bets, //洗码号	
+				this.endTime,//结束时间
+				this.form.choice,	//游戏类型	
+				this.form.injections,	//注码
+				this.form.bootnumber,		//靴号
+				this.startTime,//开始时间
+				this.form.tablenumber		//桌号
+				
+			).then(res=>{
+				// alert("xx");
+				console.log(res+"asdasdasdasdasdas");
+				this.tableData = res.data.data.list;
+				var list=res.data.data.list;
+				for(var i=0;i<list.length;i++){
+					var usertypes=list[i].userType;
+					switch (usertypes){
+						case -1:
+						this.tableData[i].userType="超级用户";
+							break;
+								case 0:
+							this.tableData[i].userType="代理";
+								break;
+									case 1:
+								this.tableData[i].userType="子代理";
+									break;
+										case 2:
+									this.tableData[i].userType="会员";
+										break;
+											case 3:
+										this.tableData[i].userType="管理平台账户";
+											break;
+												case 4:
+											this.tableData[i].userType="子会员";
+												break;
+						default:
+							break;
+					}
+				}
+				
+				
+				this.total=res.data.data.totalCount;
+				var page=res.data.data.currPage;
+				this.currentPage4=parseInt(page)+1;
+			})
+    },
+			p(s) {
+		    return s < 10 ? '0' + s : s
+		  },
+
+    //导出
+    // exportss() {
+    //   alert("导出！！");
+    // },
+    //查看结账记录
+    // ettleAccounts() {
+    //   alert("查看结账记录!!");
+    // },
+    // //导出代理洗码量
+    // exportAgent() {
+    //   alert("导出代理洗码量!!");
+    // },
+    // 分页
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  },
+created(){
+	//类型
+	// 	 types().then(res => {
+	// 					 console.log(res.data);
+	// 				var gameType = JSON.parse(JSON.stringify(res.data.data));
+	// 				for (var i = 0; i < gameType.length; i++) {
+	// 					this.choices.push({indexNameCn:gameType[i].indexNameCn,codeIndex:gameType[i].codeIndex});
+	// 	}
+	// });
+	
+	// 注码
+		//  injectionCodes().then(res => {
+		// 				 console.log(res.data);
+		// 			var gameType = JSON.parse(JSON.stringify(res.data.data));
+		// 			for (var i = 0; i < gameType.length; i++) {
+		// 				this.injectionCodes.push({indexNameCn:gameType[i].indexNameCn,codeIndex:gameType[i].codeIndex});
+		// }
+  // });
+	
+	//初始化
+    	DragonTigerlist().then(res =>{
+  		
+  		console.log(res);
+			this.tableData = res.data.data.list;
+			var list=res.data.data.list;
+			for(var i=0;i<list.length;i++){
+				var usertypes=list[i].userType;
+				switch (usertypes){
+					case -1:
+					this.tableData[i].userType="超级用户";
+						break;
+							case 0:
+						this.tableData[i].userType="代理";
+							break;
+								case 1:
+							this.tableData[i].userType="子代理";
+								break;
+									case 2:
+								this.tableData[i].userType="会员";
+									break;
+										case 3:
+									this.tableData[i].userType="管理平台账户";
+										break;
+											case 4:
+										this.tableData[i].userType="子会员";
+											break;
+					default:
+						break;
+				}
+			}
+			
+			
+			this.total=res.data.data.totalCount;
+			var page=res.data.data.currPage;
+			this.currentPage4=parseInt(page)+1;
+
+  	})
+	}
+};
+</script>
+	
+	
+<style scoped>
+.tabellist >>> .el-table__body tr:hover > td {
+  background: rgb(1, 23, 82);
+}
+.tabellist >>> .el-table td,
+.el-table th.is-leaf {
+  background: rgb(1, 19, 71);
+  color: #ffffff;
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+}
+.tabellist >>> .el-table--border {
+  color: #ffffff;
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+}
+.tabellist >>> .el-table--border th,
+.el-table__fixed-right-patch {
+  background: rgb(0, 36, 117);
+  border-collapse: collapse;
+  color: #ffffff;
+ 
+}
+.tabellist >>> .el-table th {
+  background: rgb(0, 36, 117);
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+  color: #ffffff;
+}
+#thisbox >>> .el-form-item__label,
+.el-radio {
+  color: #ffffff;
+}
+.inputcolors >>> .el-form-item__label,
+.el-radio {
+  color: #ffffff;
+}
+.el-form-item {
+  margin-bottom: 8px;
+}
+
+/* 分页变形 */
+#wrapper .el-dialog,
+.el-pager li {
+  background: #00205e;
+  width: 8%;
+}
+</style>

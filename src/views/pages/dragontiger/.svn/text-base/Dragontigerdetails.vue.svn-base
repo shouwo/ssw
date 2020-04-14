@@ -1,0 +1,170 @@
+<template>
+  <div id="app">
+    <!-- 面包屑 -->
+    <div class="bigbread">
+      <div class="bread">
+        当前位置：
+        <span>
+          <router-link to="/index/welcome" style="text-decoration:none;color:#fff;">首页</router-link>
+        </span>/
+        <span>
+          <router-link to="/index/dragontiger" style="text-decoration:none;color:#fff;">龙虎和局</router-link>
+        </span>/
+        <span>详情</span>
+      </div>
+    </div>
+
+    <div id="list">
+      <div class="tabellist">
+        <!-- 台桌类型 / 下注方式 / 帐号 / 姓名 / 总押 / 总赢 / 总洗码  / 洗码率 / 洗码费 / 
+        占股 / 币种 / 占股收益 / 总收益 / 未结收益 / 总公司 / 上次结账 / 操作-->
+        <el-table :data="tableData" border style="width: 100%">
+          <el-table-column prop="settlementTime" label="时间" width="200"></el-table-column>
+          <el-table-column prop="account" label="洗码号" width="120"></el-table-column>
+          <el-table-column prop="tableNum" label="台号" width="120"></el-table-column>
+          <el-table-column prop="shoeId" label="靴号" width="120"></el-table-column>
+          <el-table-column prop="playId" label="铺号" width="120"></el-table-column>
+          <el-table-column prop="long"  label="龙"  width="80"></el-table-column>
+					 <el-table-column prop="hu" label="虎" width="80"></el-table-column>
+					  <el-table-column prop="he"  label="和" width="80"></el-table-column>
+						<el-table-column prop="dragonTigerSum"  label="龙虎返和" width="120"></el-table-column>
+						<el-table-column prop="moneyType" label="注码"></el-table-column>
+           
+        </el-table>
+  
+       
+      </div>
+    </div>
+    <!-- 弹框 -->
+  </div>
+</template>
+
+<script>
+import {detailsDragonTiger} from '../../../apis/apis'
+export default {
+  data() {
+    return {
+      tableData: [
+        {
+        settlementTime: "",
+account:"",
+tableNum: "",
+shoeId:"",
+playId: "",
+gameResult:"" ,
+dragonTigerSum:"", 
+moneyType: "",
+bet: "",
+long:"",
+hu:"",
+he:""
+        }
+      ],
+    };
+  },
+  methods: {
+    //详情
+    details() {
+      //直接跳转
+      this.$router.push("/index/dragontiger1");
+    },
+  },
+  created(){
+		var c=this.$route.params.data;
+		
+    detailsDragonTiger(c).then(res=>{
+      console.log(res)
+			this.tableData=res.data.data.list;
+			//注码类型
+			var list=res.data.data.list;
+			for(var i=0;i<list.length;i++){
+				//注码类型
+				var zhumas=list[i].moneyType;
+				//龙虎返和
+				var returnhe=list[i].dragonTigerSum;
+				//类型
+				var types=JSON.parse(list[i].gameResult).result;
+				//注码
+				if(parseInt(zhumas)==1){
+					this.tableData[i].moneyType="RMB";
+				}
+				if(parseInt(zhumas)==0){
+					this.tableData[i].moneyType="USD";
+				}
+				//龙虎返和
+				if(returnhe==null){
+					this.tableData[i].dragonTigerSum="0";
+				}else{
+					this.tableData[i].dragonTigerSum=returnhe;
+				}
+				
+				//类型判断
+					switch (types){
+						case 1:
+						this.tableData[i].long="龙赢";
+							break;
+							case 2:
+							this.tableData[i].hu="虎赢";
+								break;
+								case 3:
+								this.tableData[i].he="和";
+									break;
+						default:
+							break;
+					}
+			}
+			
+    })
+  }
+	
+};
+</script>
+	
+	
+<style scoped>
+.tabellist >>> .el-table__body tr:hover > td {
+  background: rgb(1, 23, 82);
+}
+.tabellist >>> .el-table td,
+.el-table th.is-leaf {
+  background: rgb(1, 19, 71);
+  color: #ffffff;
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+}
+.tabellist >>> .el-table--border {
+  color: #ffffff;
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+}
+.tabellist >>> .el-table--border th,
+.el-table__fixed-right-patch {
+  background: rgb(0, 36, 117);
+  border-collapse: collapse;
+  color: #ffffff;
+}
+.tabellist >>> .el-table th {
+  background: rgb(0, 36, 117);
+  border-collapse: collapse;
+  border-color: rgb(6, 66, 89);
+  color: #ffffff;
+}
+#thisbox >>> .el-form-item__label,
+.el-radio {
+  color: #ffffff;
+}
+.inputcolors >>> .el-form-item__label,
+.el-radio {
+  color: #ffffff;
+}
+.el-form-item {
+  margin-bottom: 8px;
+}
+</style>
+<style>
+#wrapper .el-dialog,
+.el-pager li {
+  background: #00205e;
+  width: 88%;
+}
+</style>
